@@ -88,3 +88,13 @@ fastlane/test_output
 # https://github.com/johnno1962/injectionforxcode
 
 iOSInjectionProject/
+
+
+# Ruby versions
+.bundle/
+.ruby-version
+
+#Node
+node_modules
+packages/**/node_modules
+packages/development-app
