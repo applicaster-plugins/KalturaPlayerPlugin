@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="titleStyle">
+        <item name="android:textSize">50sp</item>
+        <item name="android:fontWeight">700</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">@font/montserrat</item>
+    </style>
+
+    <style name="summaryStyle" parent="titleStyle">
+        <item name="android:textSize">25sp</item>
+        <item name="fontWeight">400</item>
+    </style>
+</resources>

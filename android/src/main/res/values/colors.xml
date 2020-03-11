@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="unfocused_icon_color">#7fefefef</color>
+    <color name="focused_icon_color">#FFF</color>
+    <color name="unfocused_bg_color">#FFF</color>
+    <color name="focused_bg_color">#fc461b</color>
+    <color name="text_color">#efefef</color>
+    <color name="buffer_color">#ba3210</color>
+    <color name="light_grey">#d3d3d3</color>
+</resources>
