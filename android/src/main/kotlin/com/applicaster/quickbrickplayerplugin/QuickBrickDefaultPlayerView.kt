@@ -2,12 +2,10 @@ package com.applicaster.quickbrickplayerplugin
 
 import android.content.Context
 import android.graphics.Color
-import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.KeyEvent.*
@@ -29,49 +27,36 @@ import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.drm.DefaultDrmSessionManager
-import com.google.android.exoplayer2.drm.FrameworkMediaCrypto
-import com.google.android.exoplayer2.drm.FrameworkMediaDrm
-import com.google.android.exoplayer2.drm.HttpMediaDrmCallback
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.source.TrackGroupArray
-import com.google.android.exoplayer2.source.dash.DashMediaSource
-import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray
-import com.google.android.exoplayer2.ui.DefaultTimeBar
-import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.ui.TimeBar
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
+import com.google.android.material.snackbar.Snackbar
+import com.kaltura.android.exoplayer2.ui.DefaultTimeBar
+import com.kaltura.android.exoplayer2.ui.TimeBar
+import com.kaltura.playkit.PKLog
+import com.kaltura.playkit.PlayerEvent
+import com.kaltura.playkit.PlayerEvent.*
+import com.kaltura.playkit.PlayerState
+import com.kaltura.playkit.player.MediaSupport
+import com.kaltura.tvplayer.KalturaOvpPlayer
+import com.kaltura.tvplayer.KalturaPlayer
+import com.kaltura.tvplayer.OVPMediaOptions
+import com.kaltura.tvplayer.PlayerInitOptions
+import com.kaltura.tvplayer.config.TVPlayerParams
 import kotlinx.android.synthetic.main.player_control_view.view.*
-import kotlinx.android.synthetic.main.video_view.view.*
 import java.util.*
 
 
 class QuickBrickDefaultPlayerView(context: Context?) :
-    FrameLayout(context),
-    Player.EventListener,
-    QuickBrickPlayer,
-    Callback,
-    PlayerSenderPlugin {
+        FrameLayout(context),
+        QuickBrickPlayer,
+        Callback,
+        PlayerSenderPlugin {
+    private val log = PKLog.get("QuickBrickDefaultPlayerView")
 
-    var videoType: String? = null
-    var videoSrc: String? = null // "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"//http://playertest.longtailvideo.com/adaptive/bbbfull/bbbfull.m3u8"
-    var player: SimpleExoPlayer? = null
-    var playerView: PlayerView
+    var player: KalturaPlayer? = null
+    var playerView: com.kaltura.android.exoplayer2.ui.PlayerView
     var view: View
     val timer = Timer()
-    var currentState: String? = null
-    var trackSelector = DefaultTrackSelector()
-    var drmExtension: HashMap<String, Any>? = null
-    var licenseAcquisitionUrl: String? = null
-    private val URL_KEY_NAME: String = "ksm_server_url"
-    private val WIDEVINE_PLAYER: String = "Widevine"
-    private val PLAYER_READY: String = "playReady"
-    private val keyTitle = "title"
-    private val keySummary = "summary"
+    private var currentState: String? = null
+
     var subtitles_off = false
     var isDelayRunning = false
     private lateinit var mediaSession: MediaSessionCompat
@@ -138,22 +123,26 @@ class QuickBrickDefaultPlayerView(context: Context?) :
         playerView.findViewById<ImageButton>(R.id.exo_play_pause)?.setFocusableBg(context!!, R.drawable.selected, R.drawable.unselected, R.color.focused_bg_color, R.color.unfocused_bg_color)
         playerView.findViewById<ImageButton>(R.id.subtitles_button)?.setFocusableBg(context!!, R.drawable.selected, R.drawable.unselected, R.color.focused_bg_color, R.color.unfocused_bg_color)
 
-        playerView.findViewById<ImageButton>(R.id.exo_play_pause)?.setOnClickListener { player?.playWhenReady = !player?.playWhenReady!! }
+        playerView.findViewById<ImageButton>(R.id.exo_play_pause)?.setOnClickListener {
+            val isPlaying = player?.isPlaying ?: false;
+            if (isPlaying) {
+                player?.pause()
+            } else {
+                player?.play()
+            }
+        }
         playerView.findViewById<ImageButton>(R.id.back_button)?.setOnClickListener { backButtonPressed() }
 
         playerView.findViewById<ImageButton>(R.id.subtitles_button)
-            ?.setOnClickListener { keyboard ->
-                subtitles_off = !subtitles_off
-                trackSelector.parameters = DefaultTrackSelector.ParametersBuilder()
-                    .setRendererDisabled(C.TRACK_TYPE_VIDEO, subtitles_off)
-                    .clearSelectionOverrides()
-                    .build()
-                playerView.findViewById<ImageButton>(R.id.subtitles_button)?.setFocusableIcon(context!!, if (subtitles_off) {
-                    R.drawable.subtitles_off
-                } else {
-                    R.drawable.subtitles
-                }, R.color.focused_icon_color, R.color.unfocused_icon_color)
-            }
+                ?.setOnClickListener { keyboard ->
+                    subtitles_off = !subtitles_off
+                    //player.changeTrack()
+                    playerView.findViewById<ImageButton>(R.id.subtitles_button)?.setFocusableIcon(context!!, if (subtitles_off) {
+                        R.drawable.subtitles_off
+                    } else {
+                        R.drawable.subtitles
+                    }, R.color.focused_icon_color, R.color.unfocused_icon_color)
+                }
         playerView.findViewById<DefaultTimeBar>(R.id.exo_progress)?.addListener(object : TimeBar.OnScrubListener {
             override fun onScrubMove(timeBar: TimeBar, position: Long) {
                 playerView.findViewById<DefaultTimeBar>(R.id.exo_progress)?.exo_position?.text = position.toString()
@@ -197,9 +186,9 @@ class QuickBrickDefaultPlayerView(context: Context?) :
 
     private fun playerSeekTo(time: Long) {
         onSeek(player?.currentPosition?.toDouble(), time)
-        player?.playWhenReady = false
+        //player?.pause()
         player?.seekTo(time)
-        player?.playWhenReady = true
+        //player?.play()
     }
 
     private fun setDefaultFont(playerItem: TextView, montserratBold: Int, float: Float) {
@@ -213,109 +202,160 @@ class QuickBrickDefaultPlayerView(context: Context?) :
         return this
     }
 
-    private fun initializePlayer() {
-        // Create player instance
-        player = SimpleExoPlayer.Builder(view.context).build()
-        // default subtitles on
-        trackSelector.parameters = DefaultTrackSelector.ParametersBuilder(view.context)
-            .setRendererDisabled(C.TRACK_TYPE_VIDEO, subtitles_off)
-            .clearSelectionOverrides()
-            .build()
-        player?.addListener(this)
-        playerView.player = player
-        player?.playWhenReady = true
+    private fun initDrm() {
+        MediaSupport.initializeDrm(context) { supportedDrmSchemes, provisionPerformed, provisionError ->
+            if (provisionPerformed) {
+                if (provisionError != null) {
+                    log.e("DRM Provisioning failed", provisionError)
+                } else {
+                    log.d("DRM Provisioning succeeded")
+                }
+            }
+            log.d("DRM initialized; supported: $supportedDrmSchemes")
 
-        //controller?.setPlayer(player)
+            // Now it's safe to look at `supportedDrmSchemes`
+        }
     }
 
-    fun updateState(state: String?) {
-        state?.let { playerState ->
-            when (playerState) {
-                "PAUSE" -> {
-                    player?.playWhenReady = false
-                    player?.playbackState
-                    return
-                }
-                "START" -> {
-                    player?.playWhenReady = false
-                    player?.playWhenReady = true
-                    player?.playbackState
-                    return
-                }
-                "STOP" -> {
-                    player?.seekTo(0)
-                    player?.playWhenReady = false
-                    player?.playbackState
-                    return
-                }
-                "FF" -> {
-                    player?.playWhenReady = true
-                    var seek = (player?.currentPosition ?: 0) + 1000
-                    if (seek > player?.duration ?: 0)
-                        seek = player?.duration ?: 0
-                    player?.seekTo(seek)
-                    playerView.invalidate()
-                    player?.playWhenReady = false
-                    player?.playbackState
+    private fun initializePlayer() {
+        initDrm()
+        val playerInitOptions = PlayerInitOptions(PARTNER_ID)
+        playerInitOptions.setAutoPlay(true)
 
-                    return
-                }
-                "RW" -> {
-                    player?.playWhenReady = true
-                    var seek = (player?.currentPosition ?: 1000) - 1000
-                    if (seek < 0)
-                        seek = 0
-                    player?.seekTo(seek)
-                    player?.playWhenReady = false
-                    player?.playbackState
-                    return
-                }
-                else -> return
+        if (PARTNER_ID == 2657331) {
+            val ovpTVPlayerParams = TVPlayerParams()
+            ovpTVPlayerParams.analyticsUrl = "https://analytics.kaltura.com"
+            ovpTVPlayerParams.partnerId = 2657331
+            ovpTVPlayerParams.serviceUrl = "https://cdnapisec.kaltura.com"
+            playerInitOptions?.tvPlayerParams = ovpTVPlayerParams
+        }
+        player = KalturaOvpPlayer.create(context, playerInitOptions)
+
+        player?.setPlayerView(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+        val container = playerView
+        container.addView(player?.playerView)
+
+        val ovpMediaOptions = buildOvpMediaOptions()
+        player?.loadMedia(ovpMediaOptions) { entry, loadError ->
+            if (loadError != null) {
+                Snackbar.make(findViewById(android.R.id.content), loadError.message, Snackbar.LENGTH_LONG).show()
+            } else {
+                log.d("OVPMedia onEntryLoadComplete  entry = " + entry.id)
             }
         }
+    }
+
+    private fun addPlayerStateListener() {
+        player?.addListener(this, PlayerEvent.stateChanged) { event ->
+            log.d("State changed from " + event.oldState + " to " + event.newState)
+            currentState = event.newState.name
+            val isPlaying = player?.isPlaying ?: false
+            if (isPlaying) {
+                playerView.findViewById<ImageButton>(R.id.exo_play_pause)?.let { exo_play_pause ->
+                    exo_play_pause.setFocusableIcon(context!!, R.drawable.pause, R.color.focused_icon_color, R.color.unfocused_icon_color)
+                }
+                onPlaybackRateChange(player?.currentPosition!!)
+            } else {
+                playerView.findViewById<ImageButton>(R.id.exo_play_pause)?.let { exo_play_pause ->
+                    exo_play_pause.setFocusableIcon(context!!, R.drawable.play, R.color.focused_icon_color, R.color.unfocused_icon_color)
+                }
+            }
+            when (event.newState) {
+                PlayerState.IDLE -> videoIdle()
+                PlayerState.BUFFERING -> videoBuffering()
+                PlayerState.READY -> videoReady()
+            }
+        }
+
+        player?.addListener(this, PlayerEvent.sourceSelected) { event ->
+            log.d("sourceSelected = " + event.source)
+        }
+
+        player?.addListener(this, PlayerEvent.loadedMetadata) { event ->
+            log.d("loadedMetadata")
+        }
+
+        player?.addListener(this, PlayerEvent.ended) { event ->
+            log.d("ended")
+            videoFinished()
+        }
+
+        player?.addListener(this, PlayerEvent.seeked) { event ->
+            var currPos = player?.currentPosition ?: 0
+            log.d("seeked: " + currPos)
+        }
+
+        player?.addListener(this, PlayerEvent.playbackInfoUpdated) { event ->
+            log.d("playbackInfoUpdated: videoBitrate = " + event.playbackInfo.videoBitrate)
+        }
+
+        player?.addListener(this, PlayerEvent.error) { event ->
+            log.d("error: " + event.error.message)
+            onError(event.error.message.toString(), Exception(event.error.exception))
+        }
+
+        player?.addListener(this, tracksAvailable) { event: TracksAvailable ->
+            //When the track data available, this event occurs. It brings the info object with it.
+            var tracksInfo = event.tracksInfo
+            if (player != null) {
+                player!!.changeTrack(tracksInfo.getVideoTracks().get(0).getUniqueId())
+            }
+        }
+
+        player?.addListener(this, videoTrackChanged) { event: VideoTrackChanged ->
+            //When the track data available, this event occurs. It brings the info object with it.
+            val track = event.newTrack
+            log.d("videoTrackChanged getBitrate= " + track.bitrate)
+        }
+
+        player?.addListener(this, textTrackChanged) { event: TextTrackChanged ->
+            //When the track data available, this event occurs. It brings the info object with it.
+            val track = event.newTrack
+            log.d("textTrackChanged " + track.language + "-" + track.label)
+        }
+
+        player?.addListener(this, audioTrackChanged) { event: AudioTrackChanged ->
+            //When the track data available, this event occurs. It brings the info object with it.
+            val track = event.newTrack
+            log.d("audioTrackChanged " + track.language + "-" + track.label)
+        }
+
+    }
+
+    private fun buildOvpMediaOptions(): OVPMediaOptions {
+        val ovpMediaOptions = OVPMediaOptions()
+        ovpMediaOptions.entryId = ENTRY_ID
+        ovpMediaOptions.ks = "djJ8MjY1NzMzMXyx46jHBnPfPXQsQA0WfymgkxMsXnJdSU1ihXbo9FsLUQX5DbnnIUAdTBZ-4d9Zc3C6Vg_1Qh3b3EpJMaMf5-_rTRlKC4nUvCdoHVOkTHewFFzCYOWCB0xH2ZgKNaKf4jvtaTi7A9sujFQ4o0OKaoYP"
+        ovpMediaOptions.startPosition = 0L
+
+        return ovpMediaOptions
+    }
+
+    companion object {
+        val PARTNER_ID = 2657331 //2215841
+        val ENTRY_ID = "1_w5gbe2za"
+        val SERVER_URL = "https://cdnapisec.kaltura.com"
+    }
+
+    override fun getCurrentTime() {
+        player?.currentPosition
+    }
+
+    override fun setPlayableItem(source: ReadableMap) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun setPlayerState(state: String?) {
         this.currentState = state
     }
 
-    fun prepare(videoSrc: String?) {
-
-        player?.let { this.playerObject = it }
-
-        this.pluginPlayerContainer = video_view
-
-        this.senderView = view
-
-        this.senderAdsUrl = ""
-
-        val uri = Uri.parse(videoSrc!!)//("http://www.html5videoplayer.net/videos/toystory.mp4")
-
-        val mediaSource = buildMediaSource(uri)
-
-        senderMediaSource = mediaSource
-
-        player?.prepare(mediaSource, true, false)
-        onLoadStart()
-
-        hideSystemUi()
-    }
-
-    private fun buildMediaSource(uri: Uri): MediaSource {
-        return when (videoType) {
-            "video/hls" -> HlsMediaSource.Factory(DefaultHttpDataSourceFactory(OSUtil.getApplicationName())).createMediaSource(uri)
-            "video/dash" -> DashMediaSource.Factory(DefaultHttpDataSourceFactory((OSUtil.getApplicationName()))).createMediaSource(uri)
-            else -> ProgressiveMediaSource.Factory(DefaultHttpDataSourceFactory(OSUtil.getApplicationName())).createMediaSource(uri)
-        }
-    }
-
     private fun hideSystemUi() {
         playerView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LOW_PROFILE
-            or View.SYSTEM_UI_FLAG_FULLSCREEN
-            or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
+                or View.SYSTEM_UI_FLAG_FULLSCREEN
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -325,69 +365,8 @@ class QuickBrickDefaultPlayerView(context: Context?) :
         for (i in 0..playerView.childCount) {
             playerView.getChildAt(i)?.layout(l, t, r, b)
         }
-        playerView.videoSurfaceView?.layout(l, t, r, b)
+        playerView?.layout(l, t, r, b)
         hideSystemUi()
-    }
-
-    override fun setPlayableItem(source: ReadableMap) {
-        source.getMap("content")?.getString("src")?.let {
-            videoSrc = it
-
-            videoType = if (it.contains(".m3u8", true)) {
-                "video/hls"
-            } else if (it.contains(".mpd", true)) {
-                "video/dash"
-            } else {
-                "video"
-            }
-        }
-
-        setVideoTitleSummary(source.toHashMap())
-
-        if (hasDrm(source)) {
-            createDrm(source)
-        } else {
-            prepare(this.videoSrc)
-        }
-        hideSystemUi()
-    }
-
-    /**
-     *  Method get value from hashMap
-     *  Check if value for null
-     *  Set value for Title and Summary
-     */
-    private fun setVideoTitleSummary(toHashMap: HashMap<String, Any>) {
-        val title: String? = toHashMap[keyTitle].toString()
-        val summary: String? = toHashMap[keySummary].toString()
-
-        player_title.text = title ?: ""
-        player_description.text = summary ?: ""
-
-    }
-
-    private fun hasDrm(source: ReadableMap): Boolean {
-        val isDRM = source.takeIf { it.hasKey("extensions") }
-            ?.getMap("extensions")
-        if (isDRM != null) {
-            return isDRM.hasKey("drm")
-        }
-        return false
-    }
-
-    private fun createDrm(source: ReadableMap) {
-        source.takeIf { it.hasKey("extensions") }
-            ?.getMap("extensions")
-            ?.takeIf { it.hasKey("drm") }
-            ?.getMap("drm")
-            ?.toHashMap()?.let { hashMap ->
-
-                if (hashMap.containsKey("Widevine")) {
-                    initializeDrmPlayer(C.WIDEVINE_UUID)
-                } else if (hashMap.containsKey("playReady")) {
-                    initializeDrmPlayer(C.PLAYREADY_UUID)
-                }
-            }
     }
 
     fun onKeyChanged(event: ReadableMap?) {
@@ -412,65 +391,9 @@ class QuickBrickDefaultPlayerView(context: Context?) :
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         player?.stop()
-        player?.release()
+        player?.destroy()
         timer.cancel()
         myhandler.removeCallbacks(runnable)
-    }
-
-    private fun initializeDrmPlayer(playerUuid: UUID) {
-        player = newSimpleInstance(setupSessionManager(playerUuid))
-        prepare(this.licenseAcquisitionUrl)
-        player?.addListener(this)
-        player?.playWhenReady = true
-    }
-
-    private fun newSimpleInstance(drmSessionManager: DefaultDrmSessionManager<FrameworkMediaCrypto>?): SimpleExoPlayer? {
-        drmSessionManager?.let {
-            return ExoPlayerFactory.newSimpleInstance(context,
-                DefaultRenderersFactory(context),
-                trackSelector,
-                it
-            )
-        }
-        return ExoPlayerFactory.newSimpleInstance(context,
-            DefaultRenderersFactory(context),
-            trackSelector
-        )
-    }
-
-    private fun setupSessionManager(uuid: UUID): DefaultDrmSessionManager<FrameworkMediaCrypto>? {
-        val playerKey = if (uuid == C.WIDEVINE_UUID) WIDEVINE_PLAYER else PLAYER_READY
-        val videoObject = drmExtension?.getValue(playerKey) as HashMap<String, Any?>?
-
-        videoObject?.getValue(URL_KEY_NAME)?.toString()?.let {
-            this.licenseAcquisitionUrl = it
-            val drmCallback = HttpMediaDrmCallback(this.licenseAcquisitionUrl!!, DefaultHttpDataSourceFactory(OSUtil.getApplicationName()))
-            return DefaultDrmSessionManager(uuid, FrameworkMediaDrm.newInstance(uuid),
-                drmCallback, null, false)
-        }
-        return null
-    }
-
-
-    override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-        Log.d(this.javaClass.simpleName, "playbackState: " + playbackState + " playWhenReady " + playWhenReady)
-
-        if (playWhenReady) {
-            playerView.findViewById<ImageButton>(R.id.exo_play_pause)?.let { exo_play_pause ->
-                exo_play_pause.setFocusableIcon(context!!, R.drawable.pause, R.color.focused_icon_color, R.color.unfocused_icon_color)
-            }
-            onPlaybackRateChange(player?.currentPosition!!)
-        } else {
-            playerView.findViewById<ImageButton>(R.id.exo_play_pause)?.let { exo_play_pause ->
-                exo_play_pause.setFocusableIcon(context!!, R.drawable.play, R.color.focused_icon_color, R.color.unfocused_icon_color)
-            }
-        }
-        when (playbackState) {
-            Player.STATE_IDLE -> videoIdle()
-            Player.STATE_BUFFERING -> videoBuffering()
-            Player.STATE_READY -> videoReady()
-            Player.STATE_ENDED -> videoFinished()
-        }
     }
 
     private fun videoIdle() {
@@ -495,7 +418,7 @@ class QuickBrickDefaultPlayerView(context: Context?) :
     private fun videoFinished() {
         isBuffering(true)
         player?.seekTo(0)
-        player?.playWhenReady = false
+        player?.pause()
         playerView.showController()
         playerView.findViewById<ImageButton>(R.id.exo_play_pause)?.let { exo_play_pause ->
             exo_play_pause.requestFocus()
@@ -503,61 +426,14 @@ class QuickBrickDefaultPlayerView(context: Context?) :
         onEnd()
     }
 
-    override fun onTimelineChanged(timeline: Timeline, manifest: Any?, reason: Int) {
-        Log.d(this.javaClass.simpleName, "timeline: " + timeline?.periodCount)
-    }
-
-    override fun onTracksChanged(trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray) {
-        Log.d(this.javaClass.simpleName, "trackGroups: " + trackGroups?.length)
-    }
-
-    override fun onLoadingChanged(isLoading: Boolean) {
-        Log.d(this.javaClass.simpleName, "isLoading: " + isLoading)
-    }
-
-    override fun onRepeatModeChanged(repeatMode: Int) {
-        Log.d(this.javaClass.simpleName, "repeatMode: " + repeatMode)
-    }
-
-    override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
-        Log.d(this.javaClass.simpleName, "shuffleModeEnabled: " + shuffleModeEnabled)
-    }
-
-    override fun onPlayerError(error: ExoPlaybackException) {
-        Log.d("Error", error.toString())
-        Log.d(this.javaClass.simpleName, "error: " + error?.localizedMessage)
-        onError(error?.localizedMessage!!, error)
-    }
-
-    override fun onPositionDiscontinuity(reason: Int) {
-        Log.d(this.javaClass.simpleName, "reason: " + reason)
-    }
-
-    override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
-        Log.d(this.javaClass.simpleName, "playbackParameters: " + playbackParameters?.speed)
-    }
-
-    override fun onSeekProcessed() {
-        Log.d(this.javaClass.simpleName, "onSeekProcessed: " + player?.contentPosition)
-    }
-
-    override fun getCurrentTime() {
-//        val event = Arguments.createMap()
-//        event.putInt("currentTime", player?.currentPosition?.toInt() ?: 0)
-//        event.putInt("bufferedPosition", player?.bufferedPosition?.toInt() ?: 0)
-//        event.putInt("contentDuration", player?.duration?.toInt() ?: 0)
-//        val reactContext = context as ReactContext
-    }
-
-
     fun backButtonPressed() {
         val resultMap = WritableNativeMap()
         DataUtils.pushToReactMap(resultMap, "keyCode", KEYCODE_BACK)
         DataUtils.pushToReactMap(resultMap, "code", "")
         val reactContext = context as ReactContext
         reactContext
-            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-            .emit("onTvKeyDown", resultMap)
+                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+                .emit("onTvKeyDown", resultMap)
     }
 
     fun restartTimer() {
@@ -597,20 +473,20 @@ class QuickBrickDefaultPlayerView(context: Context?) :
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val stateBuilder = PlaybackStateCompat.Builder()
-                .setActions(
-                    PlaybackStateCompat.ACTION_PLAY or
-                        PlaybackStateCompat.ACTION_PAUSE or
-                        PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
-                        PlaybackStateCompat.ACTION_PLAY_PAUSE or
-                        PlaybackStateCompat.ACTION_FAST_FORWARD or
-                        PlaybackStateCompat.ACTION_REWIND or
-                        PlaybackStateCompat.ACTION_SEEK_TO
-                )
+                    .setActions(
+                            PlaybackStateCompat.ACTION_PLAY or
+                                    PlaybackStateCompat.ACTION_PAUSE or
+                                    PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
+                                    PlaybackStateCompat.ACTION_PLAY_PAUSE or
+                                    PlaybackStateCompat.ACTION_FAST_FORWARD or
+                                    PlaybackStateCompat.ACTION_REWIND or
+                                    PlaybackStateCompat.ACTION_SEEK_TO
+                    )
 
             mediaSession = MediaSessionCompat(view!!.context, TAG).apply {
                 setFlags(
-                    MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS or
-                        MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
+                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS or
+                                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS
                 )
 
                 setMediaButtonReceiver(null)
@@ -618,8 +494,8 @@ class QuickBrickDefaultPlayerView(context: Context?) :
                 setPlaybackState(stateBuilder.build())
 
                 setCallback(PlayerSessionCallback(
-                    player!!,
-                    playerView
+                        player!!,
+                        playerView
                 ) { hideController() })
 
                 isActive = true
@@ -641,11 +517,11 @@ class QuickBrickDefaultPlayerView(context: Context?) :
     }
 
     private fun setMobileLogic(): Boolean {
-        if (!playerView.isControllerVisible) {
-            playerView.hideController()
-        } else {
-            playerView.showController()
-        }
+//        if (!playerView.isControllerVisible) {
+//            playerView.hideController()
+//        } else {
+//            playerView.showController()
+//        }
         return true
     }
 
@@ -662,10 +538,10 @@ class QuickBrickDefaultPlayerView(context: Context?) :
     }
 
     private fun setPlayerViewPlayFastRewind() {
-        if (!OSUtil.isTv()) {
-            video_view.controllerShowTimeoutMs = 5000
-            hideOnMobile()
-        }
+//        if (!OSUtil.isTv()) {
+//            video_view.controllerShowTimeoutMs = 5000
+//            hideOnMobile()
+//        }
     }
 
     private fun hideOnMobile() {
