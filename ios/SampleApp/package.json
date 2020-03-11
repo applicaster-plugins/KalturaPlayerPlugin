@@ -1,0 +1,17 @@
+{
+  "description": "",
+  "private": true,
+  "version": "1.0.0",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^16.8.0",
+    "react-native": "0.59.10",
+    "react-native-svg": "9.13.6"
+  },
+  "name": "KalturaPlayerPlugin",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/applicaster/ZappAppleBuilder.git"
+  }
+}
