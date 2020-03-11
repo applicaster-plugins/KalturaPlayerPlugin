@@ -1,5 +1,5 @@
 //
-//  Player+ZPDependablePlayerAdDelegatePluginProtocol.swift
+//  PlayerView+ZPDependablePlayerAdDelegatePluginProtocol.swift
 //  DefaultPlayer
 //
 //  Created by Anton Kononenko on 7/22/19.
@@ -8,7 +8,7 @@
 import Foundation
 import ZappCore
 
-extension Player: DependablePlayerAdDelegatePluginProtocol {
+extension PlayerView: DependablePlayerAdDelegatePluginProtocol {
     public func advertisementWillPresented(provider: PlayerDependantPluginProtocol) {
         if let onAdChangedState = onAdChangedState {
             onAdChangedState([DependablePlayerAdDelegatePluginProtocolKeys.playingKey:true])

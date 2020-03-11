@@ -1,5 +1,5 @@
 //
-//  Player+Duration.swift
+//  PlayerView+Duration.swift
 //  DefaultPlayer
 //
 //  Created by Anton Kononenko on 12/5/18.
@@ -8,7 +8,7 @@
 import Foundation
 import CoreMedia
 
-extension Player {
+extension PlayerView {
     func playerItemDuration() -> CMTime {
         guard let playerItem = player?.currentItem else {
             return CMTime.invalid

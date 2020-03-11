@@ -11,7 +11,7 @@ import Foundation
 import React
 import ZappCore
 
-@objc public class Player: UIView {
+@objc public class PlayerView: UIView {
     @objc public var onVideoLoadStart: RCTBubblingEventBlock?
     @objc public var onVideoLoad: RCTBubblingEventBlock?
     @objc public var onVideoBuffer: RCTBubblingEventBlock?

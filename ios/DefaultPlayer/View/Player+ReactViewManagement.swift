@@ -1,5 +1,5 @@
 //
-//  Player+ReactViewManagement.swift
+//  PlayerView+ReactViewManagement.swift
 //  DefaultPlayer
 //
 //  Created by Anton Kononenko on 12/6/18.
@@ -9,7 +9,7 @@ import Foundation
 import React.RCTLog
 import ZappCore
 
-extension Player {
+extension PlayerView {
     public override func insertReactSubview(_ subview: UIView?, at atIndex: Int) {
         // We are early in the game and somebody wants to set a subview.
         // That can only be in the context of playerViewController.

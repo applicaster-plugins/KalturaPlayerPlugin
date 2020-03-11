@@ -1,5 +1,5 @@
 //
-//  Player+QBPlayerProtocol.swift
+//  PlayerView+QBPlayerProtocol.swift
 //  DefaultPlayer
 //
 //  Created by Anton Kononenko on 7/23/19.
@@ -10,7 +10,7 @@ import Foundation
 import ZappCore
 import CoreMedia
 
-extension Player: PlayerProtocol {
+extension PlayerView: PlayerProtocol {
     public func playbackPosition() -> TimeInterval {
         return TimeInterval(currentTime)
     }

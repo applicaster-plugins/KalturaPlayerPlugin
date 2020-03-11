@@ -1,5 +1,5 @@
 //
-//  Player+Observers.swift
+//  PlayerView+Observers.swift
 //  DefaultPlayer
 //
 //  Created by Anton Kononenko on 12/5/18.
@@ -9,7 +9,7 @@ import AVFoundation
 import Foundation
 import ZappCore
 
-extension Player {
+extension PlayerView {
     public override func observeValue(forKeyPath keyPath: String?,
                                       of object: Any?,
                                       change: [NSKeyValueChangeKey: Any]?,

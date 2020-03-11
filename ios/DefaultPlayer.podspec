@@ -14,6 +14,7 @@ Pod::Spec.new do |s|
   }
 	s.dependency 'React'
 	s.dependency 'ZappCore'
+  s.dependency 'PlayKit'
 
 	s.xcconfig = {
 		 'ENABLE_BITCODE' => 'YES',

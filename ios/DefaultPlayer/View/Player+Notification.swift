@@ -1,5 +1,5 @@
 //
-//  Player+Notification.swift
+//  PlayerView+Notification.swift
 //  DefaultPlayer
 //
 //  Created by Anton Kononenko on 12/2/18.
@@ -9,7 +9,7 @@
 import Foundation
 import AVKit
 
-extension Player {
+extension PlayerView {
     
     func addNotificationsObserver() {
         let defaultCenter = NotificationCenter.default

@@ -1,5 +1,5 @@
 //
-//  Player+Source.swift
+//  PlayerView+Source.swift
 //  DefaultPlayer
 //
 //  Created by Anton Kononenko on 12/2/18.
@@ -10,7 +10,7 @@ import AVKit
 import Foundation
 import React
 
-extension Player {
+extension PlayerView {
     func playerItemForSource(source: [String: Any]?,
                              completion: (_ playerItem: AVPlayerItem?) -> Void) {
         guard let source = source else {

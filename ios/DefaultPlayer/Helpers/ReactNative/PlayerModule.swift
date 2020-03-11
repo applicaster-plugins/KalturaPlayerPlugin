@@ -32,7 +32,7 @@ public class PlayerModule: RCTViewManager {
         guard let eventDispatcher = bridge?.eventDispatcher() else {
             return nil
         }
-        return Player(eventDispatcher: eventDispatcher)
+        return PlayerView(eventDispatcher: eventDispatcher)
     }
     
     @objc public override func constantsToExport() -> [AnyHashable : Any]! {

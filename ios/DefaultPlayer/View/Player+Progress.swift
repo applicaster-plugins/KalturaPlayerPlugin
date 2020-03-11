@@ -1,5 +1,5 @@
 //
-//  Player+Progress.swift
+//  PlayerView+Progress.swift
 //  DefaultPlayer
 //
 //  Created by Anton Kononenko on 12/2/18.
@@ -12,7 +12,7 @@ import AVKit
 import AVFoundation
 import ZappCore
 
-extension Player {
+extension PlayerView {
     func sendProgressUpdate() {
         guard let video = player?.currentItem,
         video.status == .readyToPlay else {

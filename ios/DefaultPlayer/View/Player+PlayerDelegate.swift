@@ -1,5 +1,5 @@
 //
-//  Player+PlayerDelegate.swift
+//  PlayerView+PlayerDelegate.swift
 //  DefaultPlayer
 //
 //  Created by Anton Kononenko on 12/6/18.
@@ -8,7 +8,7 @@
 import Foundation
 import AVKit
 
-extension Player: PlayerDelegate {
+extension PlayerView: PlayerDelegate {
     
     public func playerViewControllerWillDisappear(playerViewController:AVPlayerViewController) {
         if self.playerViewController == playerViewController,
