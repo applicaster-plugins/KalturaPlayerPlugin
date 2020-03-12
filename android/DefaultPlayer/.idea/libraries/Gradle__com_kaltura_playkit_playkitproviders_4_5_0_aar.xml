@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="Gradle: com.kaltura.playkit:playkitproviders:4.5.0@aar">
+    <ANNOTATIONS>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/b93ebfe3ff6f7c861b8f7df25a963919/playkitproviders-4.5.0/annotations.zip!/" />
+    </ANNOTATIONS>
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/b93ebfe3ff6f7c861b8f7df25a963919/playkitproviders-4.5.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/b93ebfe3ff6f7c861b8f7df25a963919/playkitproviders-4.5.0/res" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.kaltura.playkit/playkitproviders/4.5.0/3dde04128997f864804217f0c5844aa4338beffa/playkitproviders-4.5.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.kaltura.playkit/playkitproviders/4.5.0/156de379bc07e62a4f19b991e08b297b8bfe97b6/playkitproviders-4.5.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

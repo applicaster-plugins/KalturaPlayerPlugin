@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/player_controller"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/black">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".1" />
+
+    <ProgressBar
+        android:id="@+id/exo_player_progress_bar"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_above="@id/player_title"
+        android:layout_centerInParent="true"
+        android:indeterminateTint="@color/focused_bg_color"
+        android:progressTint="@color/focused_bg_color"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/right_guideline"
+        app:layout_constraintStart_toStartOf="@+id/left_guideline"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/player_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/player_description"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/player_description"
+        app:layout_constraintEnd_toStartOf="@+id/right_guideline"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/left_guideline" />
+
+    <TextView
+        android:id="@+id/player_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/player_option"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/player_option"
+        app:layout_constraintEnd_toStartOf="@+id/right_guideline"
+        app:layout_constraintStart_toStartOf="@+id/left_guideline" />
+
+    <ImageButton
+        android:id="@+id/back_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:background="@drawable/unselected"
+        android:nextFocusRight="@+id/exo_rew"
+        android:padding="5dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/back"
+        app:layout_constraintBottom_toBottomOf="@+id/exo_position"
+        app:layout_constraintStart_toStartOf="@+id/left_guideline"
+        app:layout_constraintTop_toTopOf="@+id/exo_position" />
+
+    <TextView
+        android:id="@+id/exo_position"
+        android:textSize="20sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="16dp"
+        android:layout_toEndOf="@id/back_button"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/exo_progress"
+        app:layout_constraintEnd_toStartOf="@+id/exo_progress"
+        app:layout_constraintStart_toEndOf="@+id/back_button"
+        app:layout_constraintTop_toTopOf="@+id/exo_progress"
+        tools:text="12:23" />
+
+
+    <LinearLayout
+        android:id="@+id/player_option"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/exo_progress"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/exo_progress"
+        app:layout_constraintEnd_toStartOf="@+id/right_guideline"
+        app:layout_constraintStart_toStartOf="@+id/left_guideline">
+
+        <ImageButton
+            android:id="@+id/exo_rew"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/unselected"
+            android:nextFocusLeft="@id/back_button"
+            android:nextFocusRight="@id/exo_play_pause"
+            android:nextFocusDown="@id/back_button"
+            android:padding="5dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/rewind" />
+
+        <ImageButton
+            android:id="@+id/exo_play_pause"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/unselected"
+            android:nextFocusDown="@id/back_button"
+            android:padding="10dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/play">
+
+            <requestFocus />
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/exo_ffwd"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/unselected"
+            android:nextFocusLeft="@id/exo_play_pause"
+            android:nextFocusRight="@id/subtitles_button"
+            android:nextFocusDown="@id/back_button"
+            android:padding="5dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/forwards" />
+    </LinearLayout>
+
+    <com.kaltura.android.exoplayer2.ui.DefaultTimeBar
+        android:id="@+id/exo_progress"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="32dp"
+        android:layout_toEndOf="@id/exo_position"
+        android:background="@color/transparent"
+        android:focusable="false"
+        app:buffered_color="@color/light_grey"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/exo_duration"
+        app:layout_constraintStart_toEndOf="@+id/exo_position"
+        app:played_ad_marker_color="@color/white"
+        app:unplayed_color="@color/unfocused_icon_color" />
+
+
+    <TextView
+        android:id="@+id/exo_duration"
+        android:textSize="20sp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:layout_marginEnd="16dp"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/exo_progress"
+        app:layout_constraintEnd_toStartOf="@+id/subtitles_button"
+        app:layout_constraintTop_toTopOf="@+id/exo_progress"
+        tools:text="12:23" />
+
+    <ImageButton
+        android:id="@+id/subtitles_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:background="@drawable/unselected"
+        android:nextFocusLeft="@+id/exo_ffwd"
+        android:padding="5dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/subtitles"
+        app:layout_constraintBottom_toBottomOf="@+id/exo_duration"
+        app:layout_constraintEnd_toStartOf="@+id/right_guideline"
+        app:layout_constraintTop_toTopOf="@+id/exo_duration" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".9" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="Gradle: com.kaltura.playkit:kexoplayer:2.10.6@aar">
+    <ANNOTATIONS>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/1da9a1682e62c0464a08f77e4cc72f26/kexoplayer-2.10.6/annotations.zip!/" />
+    </ANNOTATIONS>
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/1da9a1682e62c0464a08f77e4cc72f26/kexoplayer-2.10.6/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/1da9a1682e62c0464a08f77e4cc72f26/kexoplayer-2.10.6/res" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.kaltura.playkit/kexoplayer/2.10.6/e43828ac4a9f0d49f9a6729d76425ecb3db98119/kexoplayer-2.10.6-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.kaltura.playkit/kexoplayer/2.10.6/4780a4f9109d6968b37194028c645f22eacd0fdf/kexoplayer-2.10.6-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

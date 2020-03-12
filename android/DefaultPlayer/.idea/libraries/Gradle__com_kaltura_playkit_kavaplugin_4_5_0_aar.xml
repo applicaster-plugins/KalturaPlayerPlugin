@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Gradle: com.kaltura.playkit:kavaplugin:4.5.0@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8e86c483f27d7bdb2807213c5e0acd42/kavaplugin-4.5.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8e86c483f27d7bdb2807213c5e0acd42/kavaplugin-4.5.0/res" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.kaltura.playkit/kavaplugin/4.5.0/89c851bb92cb499a1f8c2ea006f605417f8e967e/kavaplugin-4.5.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.kaltura.playkit/kavaplugin/4.5.0/e8093342c379086d585e43ba1e4bc46cd7697eef/kavaplugin-4.5.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

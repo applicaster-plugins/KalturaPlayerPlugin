@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Gradle: com.kaltura.player:tvplayer:4.5.0@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/bab0183abe68bd63df2afa89e74425b0/tvplayer-4.5.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/bab0183abe68bd63df2afa89e74425b0/tvplayer-4.5.0/res" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.kaltura.player/tvplayer/4.5.0/b3f2cd7b0e6c4337529c86dbd10de2719d3e3191/tvplayer-4.5.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.kaltura.player/tvplayer/4.5.0/cf1f53fbea130d9b31b9ebf70f99f97ea151846c/tvplayer-4.5.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
