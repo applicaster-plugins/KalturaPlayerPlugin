@@ -1,0 +1,24 @@
+{
+  "name": "@applicaster/quick-brick-kaltura-player",
+  "version": "1.0.0",
+  "description": "Kaltura player plugin for Applicaster quick-brick",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/applicaster-plugins/KalturaPlayerPlugin.git"
+  },
+  "keywords": [
+    "react-native",
+    "applicaster",
+    "player-plugin"
+  ],
+  "author": "Avi Levin",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/applicaster-plugins/KalturaPlayerPlugin/issues"
+  },
+  "homepage": "https://github.com/applicaster-plugins/KalturaPlayerPlugin#readme"
+}
