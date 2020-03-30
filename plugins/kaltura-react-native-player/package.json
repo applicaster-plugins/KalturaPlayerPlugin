@@ -1,0 +1,29 @@
+{
+  "name": "@applicaster/kaltura-react-native-player",
+  "version": "1.0.0",
+  "description": "Kaltura native player with React Native wrapper",
+  "main": "./src/index.js",
+  "dependencies": {
+    "keymirror": "^0.1.1"
+  },
+  "peerDependencies": {
+    "react": "16.8.3",
+    "react-native": "0.59.10"
+  },
+  "scripts": {},
+  "files": [
+    "ios/DefaultPlayer/**/*.swift",
+    "ios/DefaultPlayer/Helpers/ReactNative/ReactNativeModulesExports.m",
+    "ios/DefaultPlayer.podspec",
+    "android/DefaultPlayer",
+    "src"
+  ],
+  "applicaster": {
+    "supportedPlatforms": [
+      "android",
+      "tvos",
+      "ios"
+    ],
+    "zappOwnerAccountId": "5e6792b8482fce000881c0e8"
+  }
+}
