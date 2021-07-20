@@ -6,7 +6,7 @@
   "license": "ISC",
   "dependencies": {
     "react": "^16.8.0",
-    "react-native": "0.59.10",
+    "react-native": "0.62.3",
     "react-native-svg": "9.13.6"
   },
   "name": "KalturaPlayerPlugin",
